@@ -364,7 +364,7 @@
             At PHPKonf 2023, you can explore the list of speakers and their information. You may submit your draft for
             the Speaker Call until July 28th.
         </p>
-        <a href="https://kommunity.com/istanbulphp/events/phpkonf-2023-c9084e65/cfp" target="_blank" class="icon-btn mt-6">
+        <a href="https://kommunity.com/istanbulphp/events/phpkonf-2023-c9084e65/cfp" target="_blank" class="icon-btn mt-6 inline-flex">
             <span>Speakers</span>
             <img data-src="/icons/primary-right-icon.svg" class="lazy" alt="">
         </a>
@@ -383,38 +383,15 @@
         <h2 class="mt-2 text-white text-center">Schedule</h2>
         <div class="flex justify-center mt-6">
             <div class="bg-noble-600 border border-noble-600 rounded-full py-2 px-10 inline-flex items-center justify-center gap-x-8 section-shadow">
-                <button class="text-base text-aquamarine-400 font-medium">Track 1</button>
+                <button class="track-btn text-base text-aquamarine-400 font-medium" onclick="selectTrack(this, 1)">Track 1</button>
                 <div class="bg-noble-500 w-0.5 h-4"></div>
-                <button class="text-base text-white font-medium">Track 2</button>
+                <button class="track-btn text-base text-white font-medium" onclick="selectTrack(this, 2)">Track 2</button>
             </div>
         </div>
 
-        <div class="lg:mt-10 mt-6">
-            <div class="lg:pt-6 pt-5 pb-5 lg:pl-8 pl-6 border-b border-noble-500">
-                <div class="flex items-center lg:gap-x-4 gap-x-2 text-sm text-noble-200 font-medium">
-                    <div>10:00 PM</div>
-                    <div class="bg-noble-500 w-0.5 h-4"></div>
-                    <div>Türkçe</div>
-                    <div class="lg:block hidden bg-noble-500 w-px h-4"></div>
-                    <div class="lg:flex hidden items-center gap-x-2">
-                        <img src="/images/tbavatar.png" class="rounded-full h-6 w-6" alt="">
-                        <div>TBA</div>
-                    </div>
-                </div>
-                <div class="lg:mt-4 mt-3 flex items-center justify-between gap-x-4 lg:pr-5 pr-6">
-                    <h3 class="lg:text-xl text-base text-white font-bold">
-                        TBA
-                    </h3>
-                    <img src="/icons/faq-chevron-down.svg" alt="">
-                </div>
-                <p class="mt-4 text-sm text-noble-200 font-medium pr-8" style="display: none">
-                    TBA
-                </p>
-                <div class="mt-3 lg:hidden flex items-center gap-x-2">
-                    <img src="/images/tbavatar.png" class="rounded-full h-6 w-6" alt="">
-                    <div class="text-noble-200">TBA</div>
-                </div>
-            </div>
+        <div id="schedule-track-1" class="lg:mt-10 mt-6 divide-y divide-noble-500">
+        </div>
+        <div id="schedule-track-2" class="lg:mt-10 mt-6 divide-y divide-noble-500" style="display: none">
         </div>
     </div>
 
@@ -502,7 +479,7 @@
                 If you want to watch the recordings of previous PHPKonf events from past years, you can access them on
                 our YouTube channel.
             </p>
-            <a target="_blank" href="https://youtube.com/@PHPKonf" class="icon-btn mt-6">
+            <a target="_blank" href="https://youtube.com/@PHPKonf" class="icon-btn inline-flex mt-6">
                 <span>View all videos</span>
                 <img data-src="/icons/primary-right-icon.svg" class="lazy" alt="">
             </a>
@@ -667,6 +644,76 @@
     function showMobileMenu() {
         mobileMenu.style.display = 'block';
         document.body.style.overflow = 'hidden';
+    }
+
+    (async function getEventDetail() {
+        const eventUrl = 'https://api.kommunity.com/api/v3/istanbulphp/events/teknasyon-phpkonf-2023-c9084e65';
+
+        const response = await fetch(eventUrl);
+        const data = (await response.json()).data;
+        const tracks = data.schedule[0].tracks;
+
+        tracks.forEach((track, index) => {
+            const scheduleTrack = document.getElementById(`schedule-track-${index + 1}`);
+
+            track.sessions.forEach((session) => {
+                const talk = session.talks[0];
+                const talkTitleArray = talk.title.split(' - ');
+                const speaker = talkTitleArray && talkTitleArray.length > 1 ? talkTitleArray[1] : null;
+
+                const sessionHtml = `<div class="lg:pt-6 pt-5 pb-5 lg:pl-8 pl-6">
+                    <div class="flex items-center lg:gap-x-4 gap-x-2 text-sm text-noble-200 font-medium">
+                        <div>${session.start}</div>
+                        <div class="bg-noble-500 w-0.5 h-4"></div>
+                        <div>Türkçe</div>
+                        <div class="${speaker ? 'lg:block' : ''} hidden bg-noble-500 w-px h-4"></div>
+                        <div class="${speaker ? 'lg:flex' : ''} hidden items-center gap-x-2">
+                            <img src="/images/tbavatar.png" class="rounded-full h-6 w-6" alt="">
+                            <div>${speaker}</div>
+                        </div>
+                    </div>
+                    <div class="lg:mt-4 mt-3 flex items-center justify-between gap-x-4 lg:pr-5 pr-6">
+                        <h3 class="lg:text-xl text-base text-white font-bold">
+                            ${talk.title}
+                        </h3>
+                        <!--<img src="/icons/faq-chevron-down.svg" alt="">-->
+                    </div>
+                    <!--
+                    <p class="mt-4 text-sm text-noble-200 font-medium pr-8" style="display: none">
+                        Lorem ipsum dolor sit amet consectetur. Vestibulum est nulla consequat diam aliquam. Tincidunt nunc
+                        ultrices eros vulputate blandit odio at proin. Libero vel convallis blandit euismod elementum magnis
+                        posuere ullamcorper. Sed rhoncus feugiat arcu integer volutpat odio arcu. Duis felis lorem
+                        scelerisque cursus ultrices felis sollicitudin sagittis elit. Eget leo elementum at hendrerit nisi
+                        cras volutpat.
+                    </p>
+                    -->
+                    <div class="mt-3 lg:hidden ${speaker ? 'flex' : ''} items-center gap-x-2">
+                        <img src="/images/tbavatar.png" class="rounded-full h-6 w-6" alt="">
+                        <div class="text-noble-200">${speaker}</div>
+                    </div>
+                </div>`
+
+                scheduleTrack.insertAdjacentHTML(
+                    'beforeend',
+                    sessionHtml
+                );
+            })
+        });
+    })();
+
+    function selectTrack(e, track) {
+        const activeTrackButton = document.querySelector('.track-btn.text-aquamarine-400');
+        activeTrackButton.classList.add('text-white');
+        activeTrackButton.classList.remove('text-aquamarine-400');
+
+        e.classList.remove('text-white');
+        e.classList.add('text-aquamarine-400');
+
+        const scheduleTrack = document.getElementById(`schedule-track-${track}`);
+        const otherScheduleTrack = document.getElementById(`schedule-track-${track === 1 ? 2 : 1}`);
+
+        otherScheduleTrack.style.display = 'none';
+        scheduleTrack.style.display = 'block';
     }
 </script>
 </body>
