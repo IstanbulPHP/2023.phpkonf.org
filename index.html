@@ -419,7 +419,7 @@
             <div class="lg:max-w-[344px] lg:p-6 lg:pb-8 px-5 py-8 rounded-lg">
                 <h3 class="text-base linear-gray-text font-semibold">STANDARD</h3>
                 <div class="mt-2 flex items-center gap-x-2 text-noble-600 text-[32px] leading-10 font-semibold">
-                    <div><sup class="text-xl">$</sup>11</div>
+                    <div>Free</div>
                 </div>
                 <ul class="mt-3 text-base text-noble-500 list-disc list-outside pl-6">
                     <li>Participation in all presentations</li>
@@ -505,7 +505,7 @@
     <div class="lg:mt-12 mt-10">
         <div class="subtitle main-sponsors-text">MAIN SPONSORS</div>
         <div class="mt-4 bg-white rounded-lg flex items-center justify-center h-[120px]">
-            <img data-src="/images/sponsors/sponsor.svg" class="lazy" alt="">
+            <img data-src="/images/sponsors/teknasyon.png" class="lazy" alt="">
         </div>
     </div>
 
@@ -513,17 +513,18 @@
         <div class="subtitle platinum-sponsors-text">PLATINUM SPONSORS</div>
         <div class="mt-4 flex flex-wrap gap-2">
             <div class="sponsor-card">
-                <img data-src="/images/sponsors/sponsor-white.svg" class="lazy" alt="">
+                <img data-src="/images/sponsors/flo.png" class="lazy" alt="">
             </div>
             <div class="sponsor-card">
-                <img data-src="/images/sponsors/sponsor-white.svg" class="lazy" alt="">
+                <img data-src="/images/sponsors/medianova.png" class="lazy" alt="">
             </div>
             <div class="sponsor-card">
-                <img data-src="/images/sponsors/sponsor-white.svg" class="lazy" alt="">
+                <img data-src="/images/sponsors/techcareer.png" class="lazy" alt="">
             </div>
         </div>
     </div>
 
+    <!--
     <div class="lg:mt-16 mt-10">
         <div class="subtitle gold-sponsors-text">GOLD SPONSORS</div>
         <div class="mt-4 flex flex-wrap gap-2">
@@ -553,6 +554,7 @@
             </div>
         </div>
     </div>
+    -->
 </div>
 
 <div class="lg:mt-10 mt-16 flex items-center gap-x-4 lg:bg-white w-full max-w-[948px] mx-auto lg:px-12 lg:py-6 rounded-card lg:border lg:border-pixie-powder-100 lg:section-shadow">
@@ -581,19 +583,19 @@
         <div class="subtitle text-center linear-aquamarine-text">Countdown to PHPKonf</div>
         <div class="mt-4 flex items-center justify-center gap-x-10">
             <div class="text-center text-aquamarine-100">
-                <div class="counter-text">54</div>
+                <div class="counter-text" id="days"></div>
                 <div class="lg:text-xl text-base font-medium">Days</div>
             </div>
             <div class="text-center text-aquamarine-100">
-                <div class="counter-text">12</div>
+                <div class="counter-text" id="hours"></div>
                 <div class="lg:text-xl text-base font-medium">Hours</div>
             </div>
             <div class="text-center text-aquamarine-100">
-                <div class="counter-text">11</div>
+                <div class="counter-text" id="minutes"></div>
                 <div class="lg:text-xl text-base font-medium">Minutes</div>
             </div>
             <div class="lg:block hidden text-center text-aquamarine-100">
-                <div class="counter-text">41</div>
+                <div class="counter-text" id="seconds"></div>
                 <div class="text-xl font-medium">Seconds</div>
             </div>
         </div>
@@ -652,14 +654,14 @@
         const response = await fetch(eventUrl);
         const data = (await response.json()).data;
         const tracks = data.schedule[0].tracks;
+        const speakers = data.speakers;
 
         tracks.forEach((track, index) => {
             const scheduleTrack = document.getElementById(`schedule-track-${index + 1}`);
 
             track.sessions.forEach((session) => {
                 const talk = session.talks[0];
-                const talkTitleArray = talk.title.split(' - ');
-                const speaker = talkTitleArray && talkTitleArray.length > 1 ? talkTitleArray[1] : null;
+                const speaker = speakers.find(speaker => speaker.slug === talk.speakers[0]);
 
                 const sessionHtml = `<div class="lg:pt-6 pt-5 pb-5 lg:pl-8 pl-6">
                     <div class="flex items-center lg:gap-x-4 gap-x-2 text-sm text-noble-200 font-medium">
@@ -668,8 +670,8 @@
                         <div>Türkçe</div>
                         <div class="${speaker ? 'lg:block' : ''} hidden bg-noble-500 w-px h-4"></div>
                         <div class="${speaker ? 'lg:flex' : ''} hidden items-center gap-x-2">
-                            <img src="/images/tbavatar.png" class="rounded-full h-6 w-6" alt="">
-                            <div>${speaker}</div>
+                            <img src="${speaker?.avatar}" class="rounded-full h-6 w-6" alt="">
+                            <div>${speaker?.name}</div>
                         </div>
                     </div>
                     <div class="lg:mt-4 mt-3 flex items-center justify-between gap-x-4 lg:pr-5 pr-6">
@@ -715,6 +717,36 @@
         otherScheduleTrack.style.display = 'none';
         scheduleTrack.style.display = 'block';
     }
+
+    function updateCountdown() {
+        const targetDate = new Date('2023-09-02T10:00:00');
+        const now = new Date();
+        const timeDifference = targetDate - now;
+
+        if (timeDifference > 0) {
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerHTML = formatInterval(days);
+            document.getElementById('hours').innerHTML = formatInterval(hours);
+            document.getElementById('minutes').innerHTML = formatInterval(minutes);
+            document.getElementById('seconds').innerHTML = formatInterval(seconds);
+
+        } else {
+            document.getElementById('days').innerHTML = 0;
+            document.getElementById('hours').innerHTML = 0;
+            document.getElementById('minutes').innerHTML = 0;
+            document.getElementById('seconds').innerHTML = 0;
+        }
+    }
+
+    function formatInterval(time) {
+        return time > 0 && time < 10 ? `0${time}` : time;
+    }
+
+    setInterval(updateCountdown, 1000);
 </script>
 </body>
 </html>
